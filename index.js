@@ -13,7 +13,8 @@ const run = async () => {
     });
     const page = await context.newPage();
 
-    console.log("Navigating to Facebook login");
+    console.log("Navigating to login");
+
     await page.goto('https://www.facebook.com/login', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('input[name=email]', { timeout: 15000 });
 
@@ -24,10 +25,7 @@ const run = async () => {
 
     await new Promise((resolve) => setTimeout(() => { resolve(1) }, 5000))
 
-    console.log("⌛ Waiting for login to complete...");
-    await page.waitForURL(url => !url.includes('/login'), { timeout: 40000 }).catch(() => {
-        console.log("URL didn't change after login it may have hit a checkpoint.");
-    });
+    console.log("Logging in");
     await page.waitForTimeout(4000);
 
     console.log("Navigating to BATELEC II Facebook page");
@@ -40,7 +38,6 @@ const run = async () => {
         const closeBtn = page.locator('[aria-label="Close"], [aria-label="Not now"]').first();
         if (await closeBtn.isVisible({ timeout: 3000 })) {
             await closeBtn.click();
-            console.log("✖️ Closed popup.");
         }
     } catch (_) { }
 
