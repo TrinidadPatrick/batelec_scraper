@@ -1,6 +1,7 @@
 const { chromium } = require('playwright-extra');
 const stealth = require('puppeteer-extra-plugin-stealth');
 const dotenv = require('dotenv');
+const { sendMail } = require('./sendMail');
 dotenv.config();
 
 chromium.use(stealth());
@@ -18,10 +19,10 @@ const run = async () => {
 
     await page.locator('input[name=email]').fill(process.env.USER);
     await page.locator('input[name=pass]').fill(process.env.PASSWORD);
-    await new Promise((resolve) => setTimeout(()=>{resolve(1)}, 2000))
+    await new Promise((resolve) => setTimeout(() => { resolve(1) }, 2000))
     await page.keyboard.press('Enter');
 
-    await new Promise((resolve) => setTimeout(()=>{resolve(1)}, 5000))
+    await new Promise((resolve) => setTimeout(() => { resolve(1) }, 5000))
 
     console.log("⌛ Waiting for login to complete...");
     await page.waitForURL(url => !url.includes('/login'), { timeout: 40000 }).catch(() => {
@@ -41,7 +42,7 @@ const run = async () => {
             await closeBtn.click();
             console.log("✖️ Closed popup.");
         }
-    } catch (_) {}
+    } catch (_) { }
 
     const results = new Set();
     const requiredWords = ['darasa', 'malvar'];
@@ -57,7 +58,7 @@ const run = async () => {
                 buttons.forEach(b => b.click());
             });
             await page.waitForTimeout(1000);
-        } catch (_) {}
+        } catch (_) { }
 
 
         const posts = page.locator('div[data-ad-comet-preview="message"]');
@@ -72,8 +73,8 @@ const run = async () => {
 
             if (hasRequired && hasTrigger && text.length > 50) {
                 const cleanText = text.split(/All reactions/i)[0]
-                                     .split(/Like\nComment/i)[0].trim();
-                
+                    .split(/Like\nComment/i)[0].trim();
+
                 if (cleanText.length > 0) {
                     results.add(cleanText);
                 }
@@ -82,7 +83,7 @@ const run = async () => {
 
         console.log(`   Scroll ${i + 1}/3 — ${results.size} advisories found...`);
         await page.mouse.wheel(0, 2000);
-        await page.waitForTimeout(4000); 
+        await page.waitForTimeout(4000);
     }
 
     console.log(`\n=========================================`);
@@ -95,6 +96,41 @@ const run = async () => {
         Array.from(results).forEach((post, i) => {
             console.log(`[NOTICE #${i + 1}]\n${post}\n-----------------------------------------\n`);
         });
+
+        let emailBody = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; color: #333;">
+                <h2 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px;">
+                    ⚡ BATELEC II Power Advisory Summary
+                </h2>
+                <p>The following power interruption notices were found for <b>Darasa</b> and <b>Malvar</b>:</p>
+            `;
+
+                    // 2. Loop through results and build HTML "Cards"
+                    Array.from(results).forEach((post, i) => {
+                        // Detect if it's a Deferment to change the color
+                        const isDeferred = post.toLowerCase().includes('deferred') || post.toLowerCase().includes('hindi matutuloy');
+                        const borderColor = isDeferred ? '#dc3545' : '#ffc107'; // Red for deferred, Yellow for scheduled
+                        const statusLabel = isDeferred ? '⚠️ DEFERRED / MOVED' : '📅 SCHEDULED';
+
+                        emailBody += `
+                <div style="margin-bottom: 20px; padding: 15px; border-left: 5px solid ${borderColor}; background-color: #f9f9f9; border-radius: 4px;">
+                    <span style="font-size: 12px; font-weight: bold; color: ${borderColor};">${statusLabel}</span>
+                    <div style="white-space: pre-wrap; margin-top: 10px; line-height: 1.5;">${post}</div>
+                </div>
+                `;
+                    });
+
+                    // 3. Add Footer
+                    emailBody += `
+                <hr style="border: 0; border-top: 1px solid #eee; margin-top: 30px;">
+                <p style="font-size: 11px; color: #777; text-align: center;">
+                    Automated Scraper Update • ${new Date().toLocaleString()}
+                </p>
+            </div>
+            `;
+
+            await sendMail(emailBody)
+            console.log('Email sent')
     }
 
     await browser.close();

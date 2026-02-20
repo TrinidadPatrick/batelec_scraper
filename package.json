@@ -20,6 +20,7 @@
   "homepage": "https://github.com/TrinidadPatrick/batelec_power_interruptions_scraper#readme",
   "dependencies": {
     "dotenv": "^17.3.1",
+    "nodemailer": "^8.0.1",
     "playwright": "^1.58.2",
     "playwright-extra": "^4.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
