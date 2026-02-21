@@ -26,18 +26,18 @@ const run = async () => {
 
     console.log("Navigating to login");
 
-    await page.goto('https://www.facebook.com/login', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('input[name=email]', { timeout: 15000 });
+    // await page.goto('https://www.facebook.com/login', { waitUntil: 'domcontentloaded' });
+    // await page.waitForSelector('input[name=email]', { timeout: 15000 });
 
-    await page.locator('input[name=email]').fill(process.env.USER);
-    await page.locator('input[name=pass]').fill(process.env.PASSWORD);
-    await new Promise((resolve) => setTimeout(() => { resolve(1) }, 2000))
-    await page.keyboard.press('Enter');
+    // await page.locator('input[name=email]').fill(process.env.USER);
+    // await page.locator('input[name=pass]').fill(process.env.PASSWORD);
+    // await new Promise((resolve) => setTimeout(() => { resolve(1) }, 2000))
+    // await page.keyboard.press('Enter');
 
-    await new Promise((resolve) => setTimeout(() => { resolve(1) }, 5000))
+    // await new Promise((resolve) => setTimeout(() => { resolve(1) }, 5000))
 
-    console.log("Logging in");
-    await page.waitForTimeout(4000);
+    // console.log("Logging in");
+    // await page.waitForTimeout(4000);
 
     console.log("Navigating to BATELEC II Facebook page");
     await page.goto('https://www.facebook.com/Batelec2AreaIII', { waitUntil: 'domcontentloaded' });
