@@ -13,7 +13,7 @@ module.exports.sendMail = async (body) => {
         from: 'swaply.support@gmail.com',
         to: 'trinidadpatrick019@gmail.com',
         subject: 'Batelec Advisory',
-        html: body
+        html: `<main>${body}<main>`
       };
 
       try {

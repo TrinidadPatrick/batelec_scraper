@@ -1,8 +1,14 @@
-const Groq = require('groq-sdk')
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const dotenv = require('dotenv');
 dotenv.config();
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+/**
+ * Sanitizes raw BATELEC II posts using Gemini 1.5 Flash.
+ * @param {string} results - The raw text collected from Facebook.
+ * @returns {string} - Cleaned HTML for the email body.
+ */
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const currentDate = new Date().toLocaleDateString('en-PH', {
   year: 'numeric',
@@ -14,10 +20,12 @@ const systemPrompt = `
 ### ROLE
 You are an expert data extraction assistant specializing in power and water utility advisories. Your goal is to transform raw social media posts into clean, aesthetic, and structured HTML advisories.
 
+##KEEP IN MIND
+each advisory is separated by 'Advisory #'
+
 ### TARGET LOCATIONS
 - Darasa, Tanauan
 - Poblacion, Malvar
-- Sampalocan
 
 ### EXTRACTION RULES
 1. **LOCATION FILTERING**: Only include advisories that mention or are semantically related to the TARGET LOCATIONS.
@@ -57,21 +65,23 @@ You are an expert data extraction assistant specializing in power and water util
 - If no advisories match the criteria, return a graceful empty state: \`<div style="text-align: center; color: #666; padding: 20px;">No active advisories for Darasa or Malvar today.</div>\`.
 `;
 
-module.exports.sanitizeResults = async (results) => {
+module.exports.sanitizeResults_OA = async (results) => {
   try {
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        {
-          role: "user", content: `${results} `
-        }
-      ],
-      temperature: 0,
-      stream: false,
-      model: "llama-3.3-70b-versatile",
+    const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash-lite",
+        systemInstruction: systemPrompt
     });
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: `Raw Data to Process:\n${results}` }] }],
+      generationConfig: {
+        temperature: 0.1,
+        topP: 0.8,
+        topK: 40,
+      },
+    });
+        const responseText = result.response.text();
 
-    return chatCompletion.choices[0]?.message?.content
+        return responseText.replace(/```html|```/g, "").trim();
   } catch (error) {
     console.error("Error:", error.message);
   }

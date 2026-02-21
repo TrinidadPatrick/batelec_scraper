@@ -2,8 +2,12 @@ name: Batelec Daily Scraper
 
 on:
   schedule:
-    # This runs at 22:00 UTC (6:00 AM Philippine Time)
+    # 6am
     - cron: "0 22 * * *"
+    # 5pm
+    - cron: "0 9 * * *"
+
+    - cron: "30 5 * * *"
   workflow_dispatch: # Allows you to run it manually for testing
 
 jobs:
@@ -36,8 +40,3 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
         run: node index.js
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: debug-screenshot
-          path: debug.png

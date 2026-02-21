@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const { sendMail } = require('./sendMail');
 const { sanitizeResults } = require('./sanitizeResults.js');
 const fs = require('fs');
+const { sanitizeResults_OA } = require('./sanitizeResults_OA.js');
 dotenv.config();
 
 const isStateValid = () => {
@@ -64,7 +65,6 @@ const run = async () => {
 
     for (let i = 0; i < 3; i++) {
         try {
-            await page.screenshot({ path: 'debug.png', fullPage: true });
             await page.evaluate(() => {
                 const buttons = Array.from(document.querySelectorAll('div[role="button"]'))
                     .filter(b => b.innerText === 'See more' || b.innerText === 'See More');
@@ -109,7 +109,6 @@ const run = async () => {
     } else {
         const rawResults = Array.from(results).map((result, index) => `Advisory # ${index + 1}: ${result} \n\n`).toLocaleString()
         const body = await sanitizeResults(rawResults)
-        console.log(rawResults)
         await sendMail(body)
         console.log('Email sent')
     }
