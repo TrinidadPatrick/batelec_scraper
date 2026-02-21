@@ -2,8 +2,22 @@ const { chromium } = require('playwright-extra');
 const stealth = require('puppeteer-extra-plugin-stealth');
 const dotenv = require('dotenv');
 const { sendMail } = require('./sendMail');
-const { sanitizeResults } = require('./sanitizeResults.js')
+const { sanitizeResults } = require('./sanitizeResults.js');
+const fs = require('fs');
 dotenv.config();
+
+const isStateValid = () => {
+    try {
+        if (fs.existsSync('state.json')) {
+            const data = fs.readFileSync('state.json', 'utf8');
+            JSON.parse(data);
+            return true;
+        }
+    } catch (error) {
+        console.warn("Invalid or corrupt state.json found. Proceeding without it.");
+    }
+    return false;
+}
 
 chromium.use(stealth());
 const ENVIRONMENT = process.env.ENVIRONMENT
@@ -16,12 +30,16 @@ const run = async () => {
         });
     }
     else {
-        console.log("Using state.json")
-        context = await browser.newContext({
-            // viewport: { width: 1920, height: 1080 },
-            storageState: 'state.json',
-            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
-        });
+        if (isStateValid()) {
+            console.log("Using state.json")
+            context = await browser.newContext({
+                storageState: 'state.json',
+                userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+            });
+        } else {
+            console.log("No valid state.json found. Closing...");
+            await browser.close();
+        }
     }
     const page = await context.newPage();
 
@@ -42,7 +60,7 @@ const run = async () => {
     const requiredWords = ['darasa', 'malvar'];
     const triggerWords = ['notice', 'interruption', 'pabatid', 'abiso', 'deferred', 'scheduled', 'restoration', 'outage'];
 
-    console.log("📜 Scrolling and collecting posts...");
+    console.log("Scrolling and collecting posts...");
 
     for (let i = 0; i < 3; i++) {
         try {
@@ -76,7 +94,7 @@ const run = async () => {
             }
         }
 
-        console.log(`   Scroll ${i + 1}/3 — ${results.size} advisories found...`);
+        console.log(`Scroll ${i + 1}/3 — ${results.size} advisories found...`);
         await page.mouse.wheel(0, 2000);
         await page.waitForTimeout(4000);
     }
