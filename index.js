@@ -2,6 +2,7 @@ const { chromium } = require('playwright-extra');
 const stealth = require('puppeteer-extra-plugin-stealth');
 const dotenv = require('dotenv');
 const { sendMail } = require('./sendMail');
+const {sanitizeResults} = require('./sanitizeResults.js')
 dotenv.config();
 
 chromium.use(stealth());
@@ -90,9 +91,9 @@ const run = async () => {
     if (results.size === 0) {
         console.log("No advisories found.");
     } else {
-        Array.from(results).forEach((post, i) => {
-            console.log(`[NOTICE #${i + 1}]\n${post}\n-----------------------------------------\n`);
-        });
+        // Array.from(results).forEach((post, i) => {
+        //     console.log(`[NOTICE #${i + 1}]\n${post}\n-----------------------------------------\n`);
+        // });
 
         let emailBody = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; color: #333;">
@@ -125,8 +126,10 @@ const run = async () => {
                 </p>
             </div>
             `;
-
-            await sendMail(emailBody)
+            const rawResults = Array.from(results).map((result, index) => `Advisory # ${index + 1}: ${result}`).toLocaleString()
+            const body = await sanitizeResults(rawResults)
+            console.log(rawResults)
+            await sendMail(body)
             console.log('Email sent')
     }
 
