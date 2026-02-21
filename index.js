@@ -15,7 +15,9 @@ const run = async () => {
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
     });}
     else{
+        console.log("Using state.json")
         context = await browser.newContext({ 
+        viewport: { width: 1920, height: 1080 },
         storageState: 'state.json',
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
     });
@@ -58,6 +60,7 @@ const run = async () => {
 
     for (let i = 0; i < 3; i++) {
         try {
+            await page.screenshot({ path: 'debug.png', fullPage: true });
             await page.evaluate(() => {
                 const buttons = Array.from(document.querySelectorAll('div[role="button"]'))
                     .filter(b => b.innerText === 'See more' || b.innerText === 'See More');

@@ -36,3 +36,8 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
         run: node index.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: debug-screenshot
+          path: debug.png
