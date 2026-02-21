@@ -2,7 +2,7 @@ const { chromium } = require('playwright-extra');
 const stealth = require('puppeteer-extra-plugin-stealth');
 const dotenv = require('dotenv');
 const { sendMail } = require('./sendMail');
-const {sanitizeResults} = require('./sanitizeResults.js')
+const { sanitizeResults } = require('./sanitizeResults.js')
 dotenv.config();
 
 chromium.use(stealth());
@@ -10,34 +10,20 @@ const ENVIRONMENT = process.env.ENVIRONMENT
 const run = async () => {
     let context;
     const browser = await chromium.launch({ headless: ENVIRONMENT === 'LOCAL' ? false : true });
-    if(ENVIRONMENT === 'LOCAL'){
-    context = await browser.newContext({
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
-    });}
-    else{
+    if (ENVIRONMENT === 'TEST') {
+        context = await browser.newContext({
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+        });
+    }
+    else {
         console.log("Using state.json")
-        context = await browser.newContext({ 
-        viewport: { width: 1920, height: 1080 },
-        storageState: 'state.json',
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
-    });
+        context = await browser.newContext({
+            // viewport: { width: 1920, height: 1080 },
+            storageState: 'state.json',
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+        });
     }
     const page = await context.newPage();
-
-    console.log("Navigating to login");
-
-    // await page.goto('https://www.facebook.com/login', { waitUntil: 'domcontentloaded' });
-    // await page.waitForSelector('input[name=email]', { timeout: 15000 });
-
-    // await page.locator('input[name=email]').fill(process.env.USER);
-    // await page.locator('input[name=pass]').fill(process.env.PASSWORD);
-    // await new Promise((resolve) => setTimeout(() => { resolve(1) }, 2000))
-    // await page.keyboard.press('Enter');
-
-    // await new Promise((resolve) => setTimeout(() => { resolve(1) }, 5000))
-
-    // console.log("Logging in");
-    // await page.waitForTimeout(4000);
 
     console.log("Navigating to BATELEC II Facebook page");
     await page.goto('https://www.facebook.com/Batelec2AreaIII', { waitUntil: 'domcontentloaded' });
@@ -100,48 +86,14 @@ const run = async () => {
     console.log(`=========================================\n`);
 
     if (results.size === 0) {
+        await sendMail(body)
         console.log("No advisories found.");
     } else {
-        // Array.from(results).forEach((post, i) => {
-        //     console.log(`[NOTICE #${i + 1}]\n${post}\n-----------------------------------------\n`);
-        // });
-
-        let emailBody = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; color: #333;">
-                <h2 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px;">
-                    ⚡ BATELEC II Power Advisory Summary
-                </h2>
-                <p>The following power interruption notices were found for <b>Darasa</b> and <b>Malvar</b>:</p>
-            `;
-
-                    // 2. Loop through results and build HTML "Cards"
-                    Array.from(results).forEach((post, i) => {
-                        // Detect if it's a Deferment to change the color
-                        const isDeferred = post.toLowerCase().includes('deferred') || post.toLowerCase().includes('hindi matutuloy');
-                        const borderColor = isDeferred ? '#dc3545' : '#ffc107'; // Red for deferred, Yellow for scheduled
-                        const statusLabel = isDeferred ? '⚠️ DEFERRED / MOVED' : '📅 SCHEDULED';
-
-                        emailBody += `
-                <div style="margin-bottom: 20px; padding: 15px; border-left: 5px solid ${borderColor}; background-color: #f9f9f9; border-radius: 4px;">
-                    <span style="font-size: 12px; font-weight: bold; color: ${borderColor};">${statusLabel}</span>
-                    <div style="white-space: pre-wrap; margin-top: 10px; line-height: 1.5;">${post}</div>
-                </div>
-                `;
-                    });
-
-                    // 3. Add Footer
-                    emailBody += `
-                <hr style="border: 0; border-top: 1px solid #eee; margin-top: 30px;">
-                <p style="font-size: 11px; color: #777; text-align: center;">
-                    Automated Scraper Update • ${new Date().toLocaleString()}
-                </p>
-            </div>
-            `;
-            const rawResults = Array.from(results).map((result, index) => `Advisory # ${index + 1}: ${result}`).toLocaleString()
-            const body = await sanitizeResults(rawResults)
-            console.log(rawResults)
-            await sendMail(body)
-            console.log('Email sent')
+        const rawResults = Array.from(results).map((result, index) => `Advisory # ${index + 1}: ${result} \n\n`).toLocaleString()
+        const body = await sanitizeResults(rawResults)
+        console.log(rawResults)
+        await sendMail(body)
+        console.log('Email sent')
     }
 
     await browser.close();

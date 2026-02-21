@@ -4,6 +4,14 @@ dotenv.config();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+const currentDate = new Date().toLocaleDateString('en-PH', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+console.log(currentDate)
+
 const systemPrompt = `
 You are a professional data sanitizer. 
 Your task is to identify power/water advisories for specific locations and return a clean, structured list.
@@ -36,6 +44,13 @@ STRICT RULES:
 </div>
 
 5. Double check that there is no double new lines, spaces, etc
+6. Make sure its one html file and content to avoid email collapsing or hiding extended contents
+7. DATE FILTERING (CRITICAL): 
+   - TODAY'S REFERENCE DATE: ${currentDate}
+   - EXCLUSION RULE: Compare the "Date" in the advisory to Today's Reference Date. 
+   - If the advisory date is BEFORE Today's Reference Date, DELETE it. 
+   - If the advisory date is EQUAL TO or AFTER Today's Reference Date, INCLUDE it.
+   - Example: If today is Feb 21, an advisory for Feb 20 must be ignored.
 
 ### DESIGN REPAIR
 - DO NOT use standard <ul> or <li> tags (these often get collapsed).
@@ -44,13 +59,14 @@ STRICT RULES:
 - Ensure the "Affected Areas" are NOT at the very bottom of the email. Add a footer like "End of Advisory" to prevent the client from thinking it's a signature.
 `;
 
-module.exports.sanitizeResults= async (results) => {
-    try {
+module.exports.sanitizeResults = async (results) => {
+  try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `Formatt this results into readable format (keep in mind each is separated with Advisory #) for mailing and and return 
-            as an html body for nodemailer html: \n ${results} \n\n Only return the result nothing else` }
+        {
+          role: "user", content: `${results} `
+        }
       ],
       // Llama 3.3 70B is currently one of the best free-tier models
       model: "llama-3.3-70b-versatile",
