@@ -6,9 +6,9 @@ const {sanitizeResults} = require('./sanitizeResults.js')
 dotenv.config();
 
 chromium.use(stealth());
-
+const ENVIRONMENT = process.env.ENVIRONMENT
 const run = async () => {
-    const browser = await chromium.launch({ headless: false });
+    const browser = await chromium.launch({ headless: ENVIRONMENT === 'LOCAL' ? false : true });
     const context = await browser.newContext({
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
     });
