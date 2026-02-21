@@ -8,10 +8,18 @@ dotenv.config();
 chromium.use(stealth());
 const ENVIRONMENT = process.env.ENVIRONMENT
 const run = async () => {
+    let context;
     const browser = await chromium.launch({ headless: ENVIRONMENT === 'LOCAL' ? false : true });
-    const context = await browser.newContext({
+    if(ENVIRONMENT === 'LOCAL'){
+    context = await browser.newContext({
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+    });}
+    else{
+        context = await browser.newContext({ 
+        storageState: 'state.json',
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
     });
+    }
     const page = await context.newPage();
 
     console.log("Navigating to login");
