@@ -68,7 +68,7 @@ const run = async () => {
 
     console.log("Scrolling and collecting posts...");
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
         try {
             await page.evaluate(() => {
                 const buttons = Array.from(document.querySelectorAll('div[role="button"]'))
@@ -99,22 +99,24 @@ const run = async () => {
             }
         }
 
-        console.log(`Scroll ${i + 1}/3 — ${results.size} advisories found...`);
+        console.log(`Scroll ${i + 1}/5 — ${results.size} advisories found...`);
         await page.mouse.wheel(0, 2000);
         await page.waitForTimeout(4000);
     }
 
-    console.log(`\n=========================================`);
-    console.log(`   BATELEC II POWER ADVISORIES (${results.size} found)`);
-    console.log(`=========================================\n`);
+    console.log(`BATELEC II POWER ADVISORIES (${results.size} found)`);
 
     if (results.size === 0) {
         console.log("No advisories found.");
     } else {
         const rawResults = Array.from(results).map((result, index) => `Advisory # ${index + 1}: ${result} \n\n`).join('\n\n')
         const body = await sanitizeResults(rawResults)
-        await sendMail(body)
-        console.log('Email sent')
+        try {
+            await sendMail(body)
+            console.log('Email sent')
+        } catch (error) {
+            console.log(`Error sending email: ${error}`)
+        }
     }
 
     await browser.close();
