@@ -8,7 +8,7 @@ on:
     - cron: "0 9 * * *"
 
     - cron: "30 5 * * *"
-  workflow_dispatch: # Allows you to run it manually for testing
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -40,4 +40,6 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+          RECIPIENTS: ${{ secrets.RECIPIENTS }}
+          PLACES: ${{ secrets.PLACES }}
         run: node index.js

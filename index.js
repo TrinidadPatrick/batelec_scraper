@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import { sendMail } from './sendMail.js';
 import { sanitizeResults } from './sanitizeResults.js';
 import fs from 'fs';
-import { sanitizeResults_OA } from './sanitizeResults_OA.js';
 dotenv.config();
 
 const isStateValid = () => {
@@ -22,6 +21,7 @@ const isStateValid = () => {
 
 chromium.use(stealth());
 const ENVIRONMENT = process.env.ENVIRONMENT
+const PLACES = process.env.PLACES
 const run = async () => {
     let context;
     const browser = await chromium.launch({ headless: ENVIRONMENT === 'LOCAL' ? false : true });
@@ -57,8 +57,13 @@ const run = async () => {
         }
     } catch (_) { }
 
+    if(!PLACES){
+        throw new Error(`Places not defined in ENV, Please create an env file with PLACES key and value formatted like this : 
+        address1,address1`)
+    }
+
     const results = new Set();
-    const requiredWords = ['darasa', 'malvar'];
+    const requiredWords = PLACES.split(",");
     const triggerWords = ['notice', 'interruption', 'pabatid', 'abiso', 'deferred', 'scheduled', 'restoration', 'outage'];
 
     console.log("Scrolling and collecting posts...");
