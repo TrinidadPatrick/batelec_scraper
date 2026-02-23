@@ -109,10 +109,9 @@ const run = async () => {
     console.log(`=========================================\n`);
 
     if (results.size === 0) {
-        await sendMail(body)
         console.log("No advisories found.");
     } else {
-        const rawResults = Array.from(results).map((result, index) => `Advisory # ${index + 1}: ${result} \n\n`).toLocaleString()
+        const rawResults = Array.from(results).map((result, index) => `Advisory # ${index + 1}: ${result} \n\n`).join('\n\n')
         const body = await sanitizeResults(rawResults)
         await sendMail(body)
         console.log('Email sent')

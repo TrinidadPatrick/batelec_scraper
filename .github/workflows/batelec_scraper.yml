@@ -6,7 +6,7 @@ on:
     - cron: "0 22 * * *"
     # 5pm
     - cron: "0 9 * * *"
-
+    # 1:38pm
     - cron: "30 5 * * *"
   workflow_dispatch:
 

@@ -3,9 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 /**
- * Sanitizes raw BATELEC II posts using Gemini 1.5 Flash.
- * @param {string} results - The raw text collected from Facebook.
- * @returns {string} - Cleaned HTML for the email body.
+ * @param {string} results
+ * @returns {string}
  */
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
