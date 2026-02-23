@@ -1,5 +1,5 @@
-const Groq = require('groq-sdk')
-const dotenv = require('dotenv');
+import Groq from 'groq-sdk';
+import dotenv from 'dotenv';
 dotenv.config();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -57,7 +57,7 @@ You are an expert data extraction assistant specializing in power and water util
 - If no advisories match the criteria, return a graceful empty state: \`<div style="text-align: center; color: #666; padding: 20px;">No active advisories for Darasa or Malvar today.</div>\`.
 `;
 
-module.exports.sanitizeResults = async (results) => {
+export const sanitizeResults = async (results) => {
   try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [

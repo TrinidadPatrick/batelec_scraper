@@ -1,10 +1,10 @@
-const { chromium } = require('playwright-extra');
-const stealth = require('puppeteer-extra-plugin-stealth');
-const dotenv = require('dotenv');
-const { sendMail } = require('./sendMail');
-const { sanitizeResults } = require('./sanitizeResults.js');
-const fs = require('fs');
-const { sanitizeResults_OA } = require('./sanitizeResults_OA.js');
+import { chromium } from 'playwright-extra';
+import stealth from 'puppeteer-extra-plugin-stealth';
+import dotenv from 'dotenv';
+import { sendMail } from './sendMail.js';
+import { sanitizeResults } from './sanitizeResults.js';
+import fs from 'fs';
+import { sanitizeResults_OA } from './sanitizeResults_OA.js';
 dotenv.config();
 
 const isStateValid = () => {

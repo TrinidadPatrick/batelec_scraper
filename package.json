@@ -13,12 +13,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/TrinidadPatrick/batelec_power_interruptions_scraper/issues"
   },
   "homepage": "https://github.com/TrinidadPatrick/batelec_power_interruptions_scraper#readme",
   "dependencies": {
+    "@getbrevo/brevo": "^4.0.1",
     "@google/generative-ai": "^0.24.1",
     "dotenv": "^17.3.1",
     "groq-sdk": "^0.37.0",

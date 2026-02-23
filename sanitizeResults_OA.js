@@ -1,5 +1,5 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const dotenv = require('dotenv');
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
 dotenv.config();
 
 /**
@@ -65,7 +65,7 @@ each advisory is separated by 'Advisory #'
 - If no advisories match the criteria, return a graceful empty state: \`<div style="text-align: center; color: #666; padding: 20px;">No active advisories for Darasa or Malvar today.</div>\`.
 `;
 
-module.exports.sanitizeResults_OA = async (results) => {
+export const sanitizeResults_OA = async (results) => {
   try {
     const model = genAI.getGenerativeModel({ 
         model: "gemini-2.5-flash-lite",
