@@ -2,6 +2,7 @@ import Groq from 'groq-sdk';
 import dotenv from 'dotenv';
 dotenv.config();
 
+const PLACES = process.env.PLACES
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const currentDate = new Date().toLocaleDateString('en-PH', {
@@ -15,9 +16,7 @@ const systemPrompt = `
 You are an expert data extraction assistant specializing in power and water utility advisories. Your goal is to transform raw social media posts into clean, aesthetic, and structured HTML advisories.
 
 ### TARGET LOCATIONS
-- Darasa, Tanauan
-- Poblacion, Malvar
-- Sampalocan
+${PLACES.split(",").map((place) => `- ${place} \n`)}
 
 ### EXTRACTION RULES
 1. **LOCATION FILTERING**: Only include advisories that mention or are semantically related to the TARGET LOCATIONS.
