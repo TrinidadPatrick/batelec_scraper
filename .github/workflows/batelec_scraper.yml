@@ -43,4 +43,5 @@ jobs:
           RECIPIENTS: ${{ secrets.RECIPIENTS }}
           PLACES: ${{ secrets.PLACES }}
           TYPE: ${{ secrets.TYPE }}
+          PRIMARY_RECIPIENT: ${{ secrets.PRIMARY_RECIPIENT }}
         run: node index.js

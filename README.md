@@ -39,6 +39,9 @@ PLACES=Darasa,Malvar,Tanauan
 # Comma-separated list of recipient emails
 RECIPIENTS=user1@gmail.com,user2@gmail.com
 
+# Primary email for system reports and failure logs
+PRIMARY_RECIPIENT=admin@gmail.com
+
 # Authentication Type: AUTH or UNAUTH
 # UNAUTH allows the scraper to run without a valid Facebook session.
 # AUTH requires a valid session; otherwise, it sends a failure notification.
@@ -87,6 +90,7 @@ This project includes a `.github/workflows/batelec_scraper.yml` workflow file. T
    - `GROQ_API_KEY`
    - `PLACES`
    - `RECIPIENTS`
+   - `PRIMARY_RECIPIENT`
    - `TYPE`
 
 ## Tech Stack
