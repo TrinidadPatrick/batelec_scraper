@@ -24,6 +24,7 @@ chromium.use(stealth());
 const ENVIRONMENT = process.env.ENVIRONMENT
 const PLACES = process.env.PLACES
 const RECIPIENTS_STRING = process.env.RECIPIENTS
+const TYPE = process.env.TYPE
 
 const run = async () => {
 
@@ -35,13 +36,18 @@ const run = async () => {
         });
     }
     else {
-        if (isStateValid()) {
+        if (isStateValid() && TYPE === 'AUTH') {
             console.log("Using state.json")
             context = await browser.newContext({
                 storageState: 'state.json',
                 userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
             });
-        } else {
+        }
+        if (TYPE === 'UNAUTH') {
+            context = await browser.newContext({
+                userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+            });
+        } if (!isStateValid() && TYPE === 'AUTH') {
             console.log("No valid state.json found. Closing...");
             await browser.close();
         }

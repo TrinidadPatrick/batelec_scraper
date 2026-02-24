@@ -30,7 +30,7 @@ const body = `<body style="margin: 0; padding: 20px; font-family: -apple-system,
 
                     </div>
 
-                </body>`
+              </body>`
 
 const TYPE = process.env.TYPE //if UNAUTH instead of AUTH, disregard if scraper is loggedin or not
 const PRIMARY_RECIPIENT = process.env.PRIMARY_RECIPIENT //if UNAUTH instead of AUTH, disregard if scraper is loggedin or not
