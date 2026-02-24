@@ -44,4 +44,6 @@ jobs:
           PLACES: ${{ secrets.PLACES }}
           TYPE: ${{ secrets.TYPE }}
           PRIMARY_RECIPIENT: ${{ secrets.PRIMARY_RECIPIENT }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: node index.js

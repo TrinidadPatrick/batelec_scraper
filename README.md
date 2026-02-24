@@ -32,6 +32,8 @@ PASSWORD=your_facebook_password
 BREVO_API_KEY=your_brevo_api_key
 GROQ_API_KEY=your_groq_api_key
 # GEMINI_API_KEY=your_gemini_api_key # Optional: If using the alternative sanitizeResults_OA.js
+SUPABASE_URL=your_supabase_url # Optional: For storing advisories to avoid duplicates and resending same advisories everyday until end of schedule
+SUPABASE_ANON_KEY=your_supabase_anon_key # Optional: For Supabase project
 
 # Comma-separated list of target places to filter advisories by
 PLACES=Darasa,Malvar,Tanauan
@@ -88,6 +90,8 @@ This project includes a `.github/workflows/batelec_scraper.yml` workflow file. T
    - `ENVIRONMENT`
    - `BREVO_API_KEY`
    - `GROQ_API_KEY`
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
    - `PLACES`
    - `RECIPIENTS`
    - `PRIMARY_RECIPIENT`

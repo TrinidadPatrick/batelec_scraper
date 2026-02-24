@@ -5,6 +5,7 @@ import { sendMail } from './sendMail.js';
 import { sanitizeResults } from './sanitizeResults.js';
 import fs from 'fs';
 import validateLoginState from './validateLoginState.js';
+import processAdvisories from './processAdvisories.js';
 dotenv.config();
 
 const isStateValid = () => {
@@ -124,8 +125,22 @@ const run = async () => {
     if (results.size === 0) {
         console.log("No advisories found.");
     } else {
-        const rawResults = Array.from(results).map((result, index) => `Advisory # ${index + 1}: ${result} \n\n`).join('\n\n')
-        const body = await sanitizeResults(rawResults)
+        const rawResults = Array.from(results).map((result, index) => `Advisory # ${index + 1}: ${result} \n\n`)
+        const final = await processAdvisories(rawResults)
+
+        if(final.length === 0) {
+            console.log('No advisories detected, skipping...')
+            return await browser.close()
+        }
+
+        const body = await sanitizeResults(final.join('\n\n'))
+
+        if(body.includes('No active advisories')){
+            console.log("No advisories found.")
+            await browser.close();
+            return
+        }
+        
         try {
             await sendMail(body, RECIPIENTS_STRING)
             console.log('Email sent')

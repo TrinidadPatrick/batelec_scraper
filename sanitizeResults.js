@@ -57,6 +57,7 @@ ${PLACES.split(",").map((place) => `- ${place} \n`)}
 `;
 
 export const sanitizeResults = async (results) => {
+  console.log(`''''Now Sanitizing advisories for email''''`)
   try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [
