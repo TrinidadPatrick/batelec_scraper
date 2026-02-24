@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { sendMail } from './sendMail.js';
 import { sanitizeResults } from './sanitizeResults.js';
 import fs from 'fs';
+import validateLoginState from './validateLoginState.js';
 dotenv.config();
 
 const isStateValid = () => {
@@ -22,7 +23,10 @@ const isStateValid = () => {
 chromium.use(stealth());
 const ENVIRONMENT = process.env.ENVIRONMENT
 const PLACES = process.env.PLACES
+const RECIPIENTS_STRING = process.env.RECIPIENTS
+
 const run = async () => {
+
     let context;
     const browser = await chromium.launch({ headless: ENVIRONMENT === 'LOCAL' ? false : true });
     if (ENVIRONMENT === 'TEST') {
@@ -49,6 +53,11 @@ const run = async () => {
     await page.waitForSelector('div[role="main"]', { timeout: 20000 });
     await page.waitForTimeout(3000);
 
+    validateLoginState(page).catch(async (error) => {
+        console.log(error)
+        await browser.close()
+    })
+
     // closes popups
     try {
         const closeBtn = page.locator('[aria-label="Close"], [aria-label="Not now"]').first();
@@ -57,7 +66,7 @@ const run = async () => {
         }
     } catch (_) { }
 
-    if(!PLACES){
+    if (!PLACES) {
         throw new Error(`Places not defined in ENV, Please create an env file with PLACES key and value formatted like this : 
         address1,address1`)
     }
@@ -112,7 +121,7 @@ const run = async () => {
         const rawResults = Array.from(results).map((result, index) => `Advisory # ${index + 1}: ${result} \n\n`).join('\n\n')
         const body = await sanitizeResults(rawResults)
         try {
-            await sendMail(body)
+            await sendMail(body, RECIPIENTS_STRING)
             console.log('Email sent')
         } catch (error) {
             console.log(`Error sending email: ${error}`)

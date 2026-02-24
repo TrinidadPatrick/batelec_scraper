@@ -42,4 +42,5 @@ jobs:
           ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
           RECIPIENTS: ${{ secrets.RECIPIENTS }}
           PLACES: ${{ secrets.PLACES }}
+          TYPE: ${{ secrets.TYPE }}
         run: node index.js

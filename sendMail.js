@@ -1,11 +1,10 @@
 import { BrevoClient } from '@getbrevo/brevo';
 
-export const sendMail = async (body) => {
-  const recipientsString = process.env.RECIPIENTS
+export const sendMail = async (body, recipients_string) => {
   const brevoApiKey = process.env.BREVO_API_KEY
 
-  if (!recipientsString) {
-    throw new Error(`No Recipients stated on ENV files, Please create an env file with RECIPIENTS key and value formatted like this : 
+  if (typeof recipients_string !== 'string') {
+    throw new Error(`Invalid recipients stated on ENV files, Please create an env file with RECIPIENTS key and value formatted like this : 
       email1@gmail.com,email2@gmail.com
       `);
   }
@@ -14,8 +13,8 @@ export const sendMail = async (body) => {
     throw new Error("BREVO_API_KEY is not defined in environment variables.");
   }
 
-  const formattdRecipients = recipientsString.split(",").map((rec) => {
-    if(!rec){
+  const formattedRecipients = recipients_string.split(",").map((rec) => {
+    if (!rec) {
       throw new Error('Invalid recipient format')
     }
 
@@ -32,7 +31,7 @@ export const sendMail = async (body) => {
     subject: "Batelec Advisory",
     htmlContent: body,
     sender: { name: "App Mailer", email: "app.mailer019@gmail.com" },
-    to: formattdRecipients
+    to: formattedRecipients
   };
 
   try {
