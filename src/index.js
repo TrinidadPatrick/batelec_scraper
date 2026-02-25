@@ -1,25 +1,13 @@
 import { chromium } from 'playwright-extra';
 import stealth from 'puppeteer-extra-plugin-stealth';
 import dotenv from 'dotenv';
-import { sendMail } from './sendMail.js';
-import { sanitizeResults } from './sanitizeResults.js';
+import { sendMail } from './services/sendMail.js';
+import { sanitizeResults } from './tools/sanitizeResults.js';
 import fs from 'fs';
-import validateLoginState from './validateLoginState.js';
-import processAdvisories from './processAdvisories.js';
+import validateLoginState from './services/validateLoginState.js';
+import processAdvisories from './services/processAdvisories.js';
+import { isStateValid } from './tools/validateJsonState.js';
 dotenv.config();
-
-const isStateValid = () => {
-    try {
-        if (fs.existsSync('state.json')) {
-            const data = fs.readFileSync('state.json', 'utf8');
-            JSON.parse(data);
-            return true;
-        }
-    } catch (error) {
-        console.warn("Invalid or corrupt state.json found. Proceeding without it.");
-    }
-    return false;
-}
 
 chromium.use(stealth());
 const ENVIRONMENT = process.env.ENVIRONMENT
